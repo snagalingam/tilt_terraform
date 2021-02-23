@@ -4,18 +4,8 @@ variable "backend_repository" {
 }
 
 variable "backend_branch" {
-  default     = "feature/update-deployment"
+  default     = "staging"
   description = "branch to pull from Github"
-}
-
-variable "beanstalk_application" {
-  default     = "tilt-staging"
-  description = "beanstalk application for deployment"
-}
-
-variable "beanstalk_environment" {
-  default     = "tilt-staging"
-  description = "beanstalk environment for deployment"
 }
 
 variable "deployment_repository" {
@@ -28,8 +18,7 @@ variable "deployment_branch" {
   description = "branch to pull from Github"
 }
 
-
 variable "pipeline_name" {
-  default     = "tilt-staging-build"
+  default     = "tilt-staging"
   description = "name of pipeline"
 }

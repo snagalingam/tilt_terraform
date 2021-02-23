@@ -46,9 +46,15 @@ resource "aws_s3_bucket" "codebuild_bucket" {
   acl    = "private"
 }
 
+# codebuild iam instance profile
+resource "aws_iam_instance_profile" "codebuild" {
+  name  = "codebuild-${var.pipeline_name}"
+  role  = "${aws_iam_role.codebuild_role.name}"
+}
+
 # codebuild iam role
 resource "aws_iam_role" "codebuild_role" {
-  name = "codebuild-role"
+  name = "codebuild-${var.pipeline_name}-role"
 
   assume_role_policy = <<EOF
 {
@@ -66,8 +72,9 @@ resource "aws_iam_role" "codebuild_role" {
 EOF
 }
 
+# codebuild iam policy
 resource "aws_iam_role_policy" "codebuild_policy" {
-  name = "codebuild-policy"
+  name = "codebuild-${var.pipeline_name}-policy"
   role = aws_iam_role.codebuild_role.name
 
   policy = <<EOF

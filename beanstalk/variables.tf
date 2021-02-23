@@ -1,19 +1,31 @@
-variable "application_name" {
-  default     = "tilt-staging"
-  description = "application name"
-}
-
-variable "application_description" {
+# staging
+variable "beanstalk_description" {
   default     = "backend deployment for staging"
-  description = "description of application"
+  description = "description of beanstalk application"
 }
 
-variable "application_environment" {
+variable "domain_name" {
+  default     = "api.tiltstaging.dev"
+  description = "domain name"
+}
+
+variable "main_name" {
   default     = "tilt-staging"
-  description = "environment name"
+  description = "name used throughout the code"
 }
 
-variable "region" {
-  default     = "us-east-2"
-  description = "Defines where your app should be deployed"
-}
+# production
+# variable "beanstalk_description" {
+#   default     = "backend deployment for production"
+#   description = "description of beanstalk application"
+# }
+#
+# variable "domain_name" {
+#   default     = "api.tiltaccess.com"
+#   description = "domain name"
+# }
+#
+# variable "main_name" {
+#   default     = "tilt-production"
+#   description = "name used throughout the code"
+# }

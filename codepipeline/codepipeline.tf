@@ -12,7 +12,7 @@ resource "aws_codepipeline" "codepipeline" {
     name = "Source"
 
     action {
-      name             = "Source"
+      name             = "Code"
       category         = "Source"
       owner            = "AWS"
       provider         = "CodeStarSourceConnection"
@@ -24,9 +24,8 @@ resource "aws_codepipeline" "codepipeline" {
         BranchName       = "${var.backend_branch}"
       }
     }
-
     action {
-      name             = "Source"
+      name             = "Deployment"
       category         = "Source"
       owner            = "AWS"
       provider         = "CodeStarSourceConnection"
@@ -52,7 +51,7 @@ resource "aws_codepipeline" "codepipeline" {
       version         = "1"
 
       configuration = {
-        ProjectName = "tilt-staging-build"
+        ProjectName = "${var.pipeline_name}"
       }
     }
   }
@@ -65,12 +64,12 @@ resource "aws_codepipeline" "codepipeline" {
       category        = "Deploy"
       owner           = "AWS"
       provider        = "ElasticBeanstalk"
-      input_artifacts = ["backend_output"]
+      input_artifacts = ["deployment_output"]
       version         = "1"
 
       configuration = {
-        ApplicationName = "${var.beanstalk_application}"
-        EnvironmentName = "${var.beanstalk_application}"
+        ApplicationName = "${var.pipeline_name}"
+        EnvironmentName = "${var.pipeline_name}-env"
       }
     }
   }
@@ -88,9 +87,15 @@ resource "aws_s3_bucket" "codepipeline_bucket" {
   acl    = "private"
 }
 
+# codepipeline instance profile
+resource "aws_iam_instance_profile" "beanstalk" {
+  name  = "codepipeline-${var.pipeline_name}"
+  role  = "${aws_iam_role.codepipeline_role.name}"
+}
+
 # codepipeline iam role
 resource "aws_iam_role" "codepipeline_role" {
-  name = "codepipeline-role"
+  name =  "codepipeline-${var.pipeline_name}-role"
 
   assume_role_policy = <<EOF
 {
@@ -118,24 +123,18 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Effect":"Allow",
-      "Action": "s3:*",
-      "Resource": [
-        "${aws_s3_bucket.codepipeline_bucket.arn}",
-        "${aws_s3_bucket.codepipeline_bucket.arn}/*"
-      ]
-    },
-    {
       "Effect": "Allow",
       "Action": [
+        "acm:DescribeCertificate",
+        "acm:ListCertificates",
+        "appconfig:StartDeployment",
+        "appconfig:GetDeployment",
+        "appconfig:StopDeployment",
+        "autoscaling:*",
+        "cloudformation:*",
+        "cloudwatch:*",
         "codebuild:BatchGetBuilds",
-        "codebuild:StartBuild"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
+        "codebuild:StartBuild",
         "codestar-connections:CreateConnection",
         "codestar-connections:DeleteConnection",
         "codestar-connections:UseConnection",
@@ -148,26 +147,99 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
         "codestar-connections:GetIndividualAccessToken",
         "codestar-connections:TagResource",
         "codestar-connections:ListTagsForResource",
-        "codestar-connections:UntagResource"
+        "codestar-connections:UntagResource",
+        "dynamodb:*",
+        "ec2:*",
+        "ecr:*",
+        "ecs:*",
+        "elasticbeanstalk:*",
+        "elasticloadbalancing:*",
+        "iam:GetPolicyVersion",
+        "iam:GetRole",
+        "iam:PassRole",
+        "iam:ListRolePolicies",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListInstanceProfiles",
+        "iam:ListRoles",
+        "iam:ListServerCertificates",
+        "logs:*",
+        "rds:*",
+        "s3:*",
+        "sns:*",
+        "sqs:*"
       ],
       "Resource": "*"
     },
     {
+      "Action": [
+        "iam:AddRoleToInstanceProfile",
+        "iam:CreateInstanceProfile",
+        "iam:CreateRole"
+      ],
       "Effect": "Allow",
+      "Resource": [
+        "arn:aws:iam::*:role/aws-elasticbeanstalk*",
+        "arn:aws:iam::*:instance-profile/aws-elasticbeanstalk*"
+      ]
+    },
+    {
+      "Action": [
+        "iam:CreateServiceLinkedRole"
+      ],
+      "Effect": "Allow",
+      "Resource": [
+        "arn:aws:iam::*:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling*"
+      ],
+      "Condition": {
+        "StringLike": {
+          "iam:AWSServiceName": "autoscaling.amazonaws.com"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateServiceLinkedRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::*:role/aws-service-role/elasticloadbalancing.amazonaws.com/AWSServiceRoleForElasticLoadBalancing*"
+      ],
+      "Condition": {
+        "StringLike": {
+          "iam:AWSServiceName": "elasticloadbalancing.amazonaws.com"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:AttachRolePolicy"
+      ],
+      "Resource": "arn:aws:iam::*:role/aws-elasticbeanstalk*",
+      "Condition": {
+        "StringLike": {
+          "iam:PolicyArn": [
+            "arn:aws:iam::aws:policy/AWSElasticBeanstalk*",
+            "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalk*"
+          ]
+        }
+      }
+    },
+    {
       "Action": "codestar-connections:*",
+      "Effect": "Allow",
       "Resource": [
         "arn:aws:codestar-connections:*:614818178581:host/*",
         "arn:aws:codestar-connections:*:614818178581:connection/*"
       ]
     },
     {
-      "Effect": "Allow",
-      "Action": [
-        "appconfig:StartDeployment",
-        "appconfig:GetDeployment",
-        "appconfig:StopDeployment"
-      ],
-      "Resource": "*"
+      "Action": "s3:*",
+      "Effect":"Allow",
+      "Resource": [
+        "${aws_s3_bucket.codepipeline_bucket.arn}",
+        "${aws_s3_bucket.codepipeline_bucket.arn}/*"
+      ]
     }
   ]
 }
