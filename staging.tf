@@ -1,6 +1,6 @@
 # S3 Bucket for storing Elastic Beanstalk task definitions
 resource "aws_s3_bucket" "staging_s3" {
-  bucket = "${var.staging_main_name}-deployments"
+  bucket = "${var.staging_main_name}-deployment"
 }
 
 # Elastic Container Repository for Docker images
@@ -25,7 +25,7 @@ resource "aws_acm_certificate" "staging_cert" {
 
 # Beanstalk instance profile
 resource "aws_iam_instance_profile" "staging_beanstalk" {
-  name  = "beanstalk-${var.staging_main_name}"
+  name  = "beanstalk-2-${var.staging_main_name}"
   role  = aws_iam_role.staging_beanstalk.name
 }
 

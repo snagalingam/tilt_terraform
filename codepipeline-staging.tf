@@ -77,7 +77,7 @@ resource "aws_codepipeline" "staging_codepipeline" {
 
 # s3 bucket
 resource "aws_s3_bucket" "staging_codepipeline_bucket" {
-  bucket = "codepipeline-${var.staging_pipeline_name}"
+  bucket = "codepipe-${var.staging_pipeline_name}"
   acl    = "private"
 }
 
@@ -89,7 +89,7 @@ resource "aws_iam_instance_profile" "staging_codepipeline" {
 
 # codepipeline iam role
 resource "aws_iam_role" "staging_codepipeline_role" {
-  name =  "codepipeline-${var.staging_pipeline_name}-role"
+  name =  "codepipeline-2-${var.staging_pipeline_name}-role"
 
   assume_role_policy = <<EOF
 {
