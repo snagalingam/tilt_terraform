@@ -1,10 +1,10 @@
 # code pipeline
-resource "aws_codepipeline" "codepipeline" {
-  name     = "${var.pipeline_name}"
-  role_arn = aws_iam_role.codepipeline_role.arn
+resource "aws_codepipeline" "staging_codepipeline" {
+  name     = var.staging_pipeline_name
+  role_arn = aws_iam_role.staging_codepipeline_role.arn
 
   artifact_store {
-    location = "codepipeline-${var.pipeline_name}"
+    location = "codepipeline-${var.staging_pipeline_name}"
     type     = "S3"
   }
 
@@ -20,8 +20,8 @@ resource "aws_codepipeline" "codepipeline" {
       output_artifacts = ["backend_output"]
       configuration = {
         ConnectionArn    = aws_codestarconnections_connection.github.arn
-        FullRepositoryId = "${var.backend_repository}"
-        BranchName       = "${var.backend_branch}"
+        FullRepositoryId = var.staging_backend_repository
+        BranchName       = var.staging_backend_branch
       }
     }
     action {
@@ -33,8 +33,8 @@ resource "aws_codepipeline" "codepipeline" {
       output_artifacts = ["deployment_output"]
       configuration = {
         ConnectionArn    = aws_codestarconnections_connection.github.arn
-        FullRepositoryId = "${var.deployment_repository}"
-        BranchName       = "${var.deployment_branch}"
+        FullRepositoryId = var.staging_deployment_repository
+        BranchName       = var.staging_deployment_branch
       }
     }
   }
@@ -51,7 +51,7 @@ resource "aws_codepipeline" "codepipeline" {
       version         = "1"
 
       configuration = {
-        ProjectName = "${var.pipeline_name}"
+        ProjectName = var.staging_pipeline_name
       }
     }
   }
@@ -68,34 +68,28 @@ resource "aws_codepipeline" "codepipeline" {
       version         = "1"
 
       configuration = {
-        ApplicationName = "${var.pipeline_name}"
-        EnvironmentName = "${var.pipeline_name}-env"
+        ApplicationName = var.staging_pipeline_name
+        EnvironmentName = "${var.staging_pipeline_name}-env"
       }
     }
   }
 }
 
-# github connection
-resource "aws_codestarconnections_connection" "github" {
-  name          = "github"
-  provider_type = "GitHub"
-}
-
 # s3 bucket
-resource "aws_s3_bucket" "codepipeline_bucket" {
-  bucket = "codepipeline-${var.pipeline_name}"
+resource "aws_s3_bucket" "staging_codepipeline_bucket" {
+  bucket = "codepipeline-${var.staging_pipeline_name}"
   acl    = "private"
 }
 
 # codepipeline instance profile
-resource "aws_iam_instance_profile" "beanstalk" {
-  name  = "codepipeline-${var.pipeline_name}"
-  role  = "${aws_iam_role.codepipeline_role.name}"
+resource "aws_iam_instance_profile" "staging_codepipeline" {
+  name  = "codepipeline-${var.staging_pipeline_name}"
+  role  = aws_iam_role.staging_codepipeline_role.name
 }
 
 # codepipeline iam role
-resource "aws_iam_role" "codepipeline_role" {
-  name =  "codepipeline-${var.pipeline_name}-role"
+resource "aws_iam_role" "staging_codepipeline_role" {
+  name =  "codepipeline-${var.staging_pipeline_name}-role"
 
   assume_role_policy = <<EOF
 {
@@ -114,9 +108,9 @@ EOF
 }
 
 # codepipeline iam policy
-resource "aws_iam_role_policy" "codepipeline_policy" {
+resource "aws_iam_role_policy" "staging_codepipeline_policy" {
   name = "codepipeline-policy"
-  role = aws_iam_role.codepipeline_role.id
+  role = aws_iam_role.staging_codepipeline_role.id
 
   policy = <<EOF
 {
@@ -237,8 +231,8 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
       "Action": "s3:*",
       "Effect":"Allow",
       "Resource": [
-        "${aws_s3_bucket.codepipeline_bucket.arn}",
-        "${aws_s3_bucket.codepipeline_bucket.arn}/*"
+        "${aws_s3_bucket.staging_codepipeline_bucket.arn}",
+        "${aws_s3_bucket.staging_codepipeline_bucket.arn}/*"
       ]
     }
   ]

@@ -1,16 +1,11 @@
-# set the region
-provider "aws" {
-  region = "us-east-2"
-}
-
 # S3 Bucket for storing Elastic Beanstalk task definitions
-resource "aws_s3_bucket" "s3" {
-  bucket = "${var.main_name}-deployments"
+resource "aws_s3_bucket" "staging_s3" {
+  bucket = "${var.staging_main_name}-deployments"
 }
 
 # Elastic Container Repository for Docker images
-resource "aws_ecr_repository" "ecr" {
-  name                 = "${var.main_name}"
+resource "aws_ecr_repository" "staging_ecr" {
+  name                 = var.staging_main_name
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
@@ -19,8 +14,8 @@ resource "aws_ecr_repository" "ecr" {
 }
 
 # certificate
-resource "aws_acm_certificate" "cert" {
-  domain_name       = "${var.domain_name}"
+resource "aws_acm_certificate" "staging_cert" {
+  domain_name       = var.staging_domain_name
   validation_method = "DNS"
 
   lifecycle {
@@ -29,13 +24,13 @@ resource "aws_acm_certificate" "cert" {
 }
 
 # Beanstalk instance profile
-resource "aws_iam_instance_profile" "beanstalk" {
-  name  = "beanstalk-${var.main_name}"
-  role  = "${aws_iam_role.beanstalk.name}"
+resource "aws_iam_instance_profile" "staging_beanstalk" {
+  name  = "beanstalk-${var.staging_main_name}"
+  role  = aws_iam_role.staging_beanstalk.name
 }
 
-resource "aws_iam_role" "beanstalk" {
-  name = "beanstalk-${var.main_name}-role"
+resource "aws_iam_role" "staging_beanstalk" {
+  name = "beanstalk-${var.staging_main_name}-role"
 
   assume_role_policy = <<EOF
 {
@@ -55,9 +50,9 @@ EOF
 
 # Beanstalk EC2 Policy
 # Overriding because by default Beanstalk does not have a permission to Read ECR
-resource "aws_iam_role_policy" "beanstalk_policy" {
+resource "aws_iam_role_policy" "staging_beanstalk_policy" {
   name = "beanstalk-policy-with-ECR"
-  role = aws_iam_role.beanstalk.id
+  role = aws_iam_role.staging_beanstalk.id
 
   policy = <<EOF
 {
@@ -91,16 +86,16 @@ EOF
 }
 
 # Beanstalk Application
-resource "aws_elastic_beanstalk_application" "beanstalk_application" {
-  name        = "${var.main_name}"
-  description = "${var.beanstalk_description}"
+resource "aws_elastic_beanstalk_application" "staging_beanstalk_application" {
+  name        = var.staging_main_name
+  description = var.staging_beanstalk_description
 }
 
 # Beanstalk Environment
-resource "aws_elastic_beanstalk_environment" "beanstalk_application_environment" {
-  name                = "${var.main_name}-env"
-  application         = "${aws_elastic_beanstalk_application.beanstalk_application.name}"
-  solution_stack_name = "64bit Amazon Linux 2018.03 v2.16.4 running Docker 19.03.13-ce "
+resource "aws_elastic_beanstalk_environment" "staging_beanstalk_application_environment" {
+  name                = "${var.staging_main_name}-env"
+  application         = aws_elastic_beanstalk_application.staging_beanstalk_application.name
+  solution_stack_name = "64bit Amazon Linux 2018.03 v2.16.5 running Docker 19.03.13-ce "
   tier                = "WebServer"
 
   setting {
@@ -118,6 +113,6 @@ resource "aws_elastic_beanstalk_environment" "beanstalk_application_environment"
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "IamInstanceProfile"
-    value     = "${aws_iam_instance_profile.beanstalk.name}"
+    value     = aws_iam_instance_profile.staging_beanstalk.name
   }
 }

@@ -92,7 +92,7 @@ resource "aws_cloudformation_stack" "chatbot_slack_configuration" {
   name = "cloudformation-notification-${var.pipeline_name}"
   template_body = data.local_file.cloudformation_template.content
   parameters = {
-    ConfigurationNameParameter = "${var.pipeline_name}"
+    ConfigurationNameParameter = var.pipeline_name
     IamRoleArnParameter        = aws_iam_role.chatbot_role.arn
     LoggingLevelParameter      = "ERROR"
     SlackChannelIdParameter    = "C018V9QMDQ8"

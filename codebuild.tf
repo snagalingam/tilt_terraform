@@ -1,6 +1,6 @@
 # code build
 resource "aws_codebuild_project" "codebuild" {
-  name          = "${var.pipeline_name}"
+  name          = var.pipeline_name
   description   = "tilt backend build"
   build_timeout = "5"
   service_role  = aws_iam_role.codebuild_role.arn
@@ -25,7 +25,7 @@ resource "aws_codebuild_project" "codebuild" {
   logs_config {
     cloudwatch_logs {
       group_name  = "/aws/codebuild/${var.pipeline_name}"
-      stream_name = "${var.pipeline_name}"
+      stream_name = var.pipeline_name
     }
 
     s3_logs {
@@ -49,7 +49,7 @@ resource "aws_s3_bucket" "codebuild_bucket" {
 # codebuild iam instance profile
 resource "aws_iam_instance_profile" "codebuild" {
   name  = "codebuild-${var.pipeline_name}"
-  role  = "${aws_iam_role.codebuild_role.name}"
+  role  = aws_iam_role.codebuild_role.name
 }
 
 # codebuild iam role
