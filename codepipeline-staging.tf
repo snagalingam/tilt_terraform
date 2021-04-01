@@ -4,7 +4,7 @@ resource "aws_codepipeline" "staging_codepipeline" {
   role_arn = aws_iam_role.staging_codepipeline_role.arn
 
   artifact_store {
-    location = "codepipeline-${var.staging_pipeline_name}"
+    location = "codepipeline-tilt-staging"
     type     = "S3"
   }
 
@@ -19,7 +19,7 @@ resource "aws_codepipeline" "staging_codepipeline" {
       version          = "1"
       output_artifacts = ["backend_output"]
       configuration = {
-        ConnectionArn    = aws_codestarconnections_connection.github.arn
+        ConnectionArn    = "arn:aws:codestar-connections:us-east-2:614818178581:connection/55bda5c3-35a6-4bd4-9886-b342a185a1dc"
         FullRepositoryId = var.staging_backend_repository
         BranchName       = var.staging_backend_branch
       }
@@ -32,7 +32,7 @@ resource "aws_codepipeline" "staging_codepipeline" {
       version          = "1"
       output_artifacts = ["deployment_output"]
       configuration = {
-        ConnectionArn    = aws_codestarconnections_connection.github.arn
+        ConnectionArn    = "arn:aws:codestar-connections:us-east-2:614818178581:connection/55bda5c3-35a6-4bd4-9886-b342a185a1dc"
         FullRepositoryId = var.staging_deployment_repository
         BranchName       = var.staging_deployment_branch
       }
@@ -83,7 +83,7 @@ resource "aws_s3_bucket" "staging_codepipeline_bucket" {
 
 # codepipeline instance profile
 resource "aws_iam_instance_profile" "staging_codepipeline" {
-  name  = "codepipeline-${var.staging_pipeline_name}"
+  name  = "codepipeline-2-${var.staging_pipeline_name}"
   role  = aws_iam_role.staging_codepipeline_role.name
 }
 

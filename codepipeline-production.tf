@@ -19,7 +19,7 @@ resource "aws_codepipeline" "codepipeline" {
       version          = "1"
       output_artifacts = ["backend_output"]
       configuration = {
-        ConnectionArn    = aws_codestarconnections_connection.github.arn
+        ConnectionArn    = "arn:aws:codestar-connections:us-east-2:614818178581:connection/55bda5c3-35a6-4bd4-9886-b342a185a1dc"
         FullRepositoryId = var.backend_repository
         BranchName       = var.backend_branch
       }
@@ -32,7 +32,7 @@ resource "aws_codepipeline" "codepipeline" {
       version          = "1"
       output_artifacts = ["deployment_output"]
       configuration = {
-        ConnectionArn    = aws_codestarconnections_connection.github.arn
+        ConnectionArn    = "arn:aws:codestar-connections:us-east-2:614818178581:connection/55bda5c3-35a6-4bd4-9886-b342a185a1dc"
         FullRepositoryId = var.deployment_repository
         BranchName       = var.deployment_branch
       }

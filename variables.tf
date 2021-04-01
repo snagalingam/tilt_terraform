@@ -10,7 +10,7 @@ variable "staging_domain_name" {
 }
 
 variable "staging_main_name" {
-  default     = "tilt-staging"
+  default     = "tilt-stage"
   description = "name used throughout the code"
 }
 
@@ -35,7 +35,7 @@ variable "staging_deployment_branch" {
 }
 
 variable "staging_pipeline_name" {
-  default     = "tilt-staging"
+  default     = "tilt-stage"
   description = "name of pipeline"
 }
 
