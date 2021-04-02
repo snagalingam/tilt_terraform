@@ -98,10 +98,10 @@ resource "aws_iam_role_policy" "staging_codebuild_policy" {
       ],
       "Effect": "Allow",
       "Resource": [
-        "${aws_s3_bucket.staging_codebuild_bucket.arn}",
-        "${aws_s3_bucket.staging_codebuild_bucket.arn}/*",
-        "${aws_s3_bucket.staging_codepipeline_bucket.arn}",
-        "${aws_s3_bucket.staging_codepipeline_bucket.arn}/*"
+        "arn:aws:s3:::codepipeline-tilt-staging",
+        "arn:aws:s3:::codepipeline-tilt-staging/*",
+        "arn:aws:s3:::codepipeline-tilt-staging",
+        "arn:aws:s3:::codepipeline-tilt-staging/*"
       ]
     },
     {
