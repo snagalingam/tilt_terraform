@@ -4,7 +4,7 @@ resource "aws_codepipeline" "staging_codepipeline" {
   role_arn = aws_iam_role.staging_codepipeline_role.arn
 
   artifact_store {
-    location = "codepipeline-${var.staging_pipeline_name}"
+    location = "codepipeline-tilt-staging"
     type     = "S3"
   }
 
@@ -17,9 +17,9 @@ resource "aws_codepipeline" "staging_codepipeline" {
       owner            = "AWS"
       provider         = "CodeStarSourceConnection"
       version          = "1"
-      output_artifacts = ["backend_output"]
+      output_artifacts = ["staging_backend_output"]
       configuration = {
-        ConnectionArn    = aws_codestarconnections_connection.github.arn
+        ConnectionArn    = "arn:aws:codestar-connections:us-east-2:614818178581:connection/55bda5c3-35a6-4bd4-9886-b342a185a1dc"
         FullRepositoryId = var.staging_backend_repository
         BranchName       = var.staging_backend_branch
       }
@@ -30,9 +30,9 @@ resource "aws_codepipeline" "staging_codepipeline" {
       owner            = "AWS"
       provider         = "CodeStarSourceConnection"
       version          = "1"
-      output_artifacts = ["deployment_output"]
+      output_artifacts = ["staging_deployment_output"]
       configuration = {
-        ConnectionArn    = aws_codestarconnections_connection.github.arn
+        ConnectionArn    = "arn:aws:codestar-connections:us-east-2:614818178581:connection/55bda5c3-35a6-4bd4-9886-b342a185a1dc"
         FullRepositoryId = var.staging_deployment_repository
         BranchName       = var.staging_deployment_branch
       }
@@ -47,7 +47,7 @@ resource "aws_codepipeline" "staging_codepipeline" {
       category        = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
-      input_artifacts = ["backend_output"]
+      input_artifacts = ["staging_backend_output"]
       version         = "1"
 
       configuration = {
@@ -64,7 +64,7 @@ resource "aws_codepipeline" "staging_codepipeline" {
       category        = "Deploy"
       owner           = "AWS"
       provider        = "ElasticBeanstalk"
-      input_artifacts = ["deployment_output"]
+      input_artifacts = ["staging_deployment_output"]
       version         = "1"
 
       configuration = {
@@ -76,14 +76,14 @@ resource "aws_codepipeline" "staging_codepipeline" {
 }
 
 # s3 bucket
-resource "aws_s3_bucket" "staging_codepipeline_bucket" {
-  bucket = "codepipe-${var.staging_pipeline_name}"
-  acl    = "private"
-}
+# resource "aws_s3_bucket" "staging_codepipeline_bucket" {
+#   bucket = "codepipeline-tilt-staging"
+#   acl    = "private"
+# }
 
 # codepipeline instance profile
 resource "aws_iam_instance_profile" "staging_codepipeline" {
-  name  = "codepipeline-${var.staging_pipeline_name}"
+  name  = "codepipeline-2-${var.staging_pipeline_name}"
   role  = aws_iam_role.staging_codepipeline_role.name
 }
 
@@ -231,8 +231,8 @@ resource "aws_iam_role_policy" "staging_codepipeline_policy" {
       "Action": "s3:*",
       "Effect":"Allow",
       "Resource": [
-        "${aws_s3_bucket.staging_codepipeline_bucket.arn}",
-        "${aws_s3_bucket.staging_codepipeline_bucket.arn}/*"
+        "arn:aws:s3:::codepipeline-tilt-staging",
+        "arn:aws:s3:::codepipeline-tilt-staging/*"
       ]
     }
   ]
