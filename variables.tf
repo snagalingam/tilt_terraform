@@ -1,32 +1,27 @@
-# staging
+################################################################################
+# General Variables
+################################################################################
+variable "aws_github_connection" {
+  default     = "arn:aws:codestar-connections:us-east-2:614818178581:connection/55bda5c3-35a6-4bd4-9886-b342a185a1dc"
+  description = "AWS Connection to Github via Codestar"
+}
+
+variable "backend_repository" {
+  default     = "snagalingam/tilt_backend"
+  description = "GitHub repository for backend code"
+}
+
+################################################################################
+# Staging Variables
+################################################################################
+variable "staging_backend_branch" {
+  default     = "staging"
+  description = "staging branch"
+}
+
 variable "staging_beanstalk_description" {
   default     = "backend deployment for staging"
   description = "description of beanstalk application"
-}
-
-variable "staging_domain_name" {
-  default     = "api.tiltstaging.dev"
-  description = "domain name"
-}
-
-variable "staging_main_name" {
-  default     = "tilt-stage"
-  description = "name used throughout the code"
-}
-
-variable "staging_backend_repository" {
-  default     = "snagalingam/tilt_backend"
-  description = "GitHub repository"
-}
-
-variable "staging_backend_branch" {
-  default     = "staging"
-  description = "branch to pull from Github"
-}
-
-variable "staging_deployment_repository" {
-  default     = "snagalingam/tilt_backend_staging"
-  description = "GitHub repository"
 }
 
 variable "staging_deployment_branch" {
@@ -34,48 +29,50 @@ variable "staging_deployment_branch" {
   description = "branch to pull from Github"
 }
 
-variable "staging_pipeline_name" {
-  default     = "tilt-stage"
-  description = "name of pipeline"
+variable "staging_deployment_repository" {
+  default     = "snagalingam/tilt_backend_staging"
+  description = "GitHub repository for deployment code"
 }
 
-# production
-variable "beanstalk_description" {
-  default     = "backend deployment for staging"
-  description = "description of beanstalk application"
+variable "staging_domain_name" {
+  default     = "api.tiltstaging.dev"
+  description = "staging domain name"
 }
 
-variable "domain_name" {
-  default     = "api.tilt.dev"
-  description = "domain name"
+variable "staging_name" {
+  default     = "tilt-staging"
+  description = "name of staging pipeline"
 }
 
-variable "main_name" {
-  default     = "tilt-production"
-  description = "name used throughout the code"
-}
-
-variable "backend_repository" {
-  default     = "snagalingam/tilt_backend"
-  description = "GitHub repository"
-}
-
-variable "backend_branch" {
+################################################################################
+# Production Variables
+################################################################################
+variable "production_backend_branch" {
   default     = "staging"
   description = "branch to pull from Github"
 }
 
-variable "deployment_repository" {
-  default     = "snagalingam/tilt_backend_staging"
-  description = "GitHub repository"
+variable "production_beanstalk_description" {
+  default     = "backend deployment for production"
+  description = "description of beanstalk application"
 }
 
-variable "deployment_branch" {
+variable "production_deployment_branch" {
   default     = "main"
   description = "branch to pull from Github"
 }
 
-variable "pipeline_name" {
+variable "production_deployment_repository" {
+  default     = "snagalingam/tilt_backend_staging"
+  description = "GitHub repository for production"
+}
+
+variable "production_domain_name" {
+  default     = "api.tiltacccess.com"
+  description = "production domain name"
+}
+
+variable "production_name" {
   default     = "tilt-production"
-  description = "name of pipeline"
+  description = "name of production pipeline"
 }
