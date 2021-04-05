@@ -15,7 +15,7 @@ variable "backend_repository" {
 # Staging Variables
 ################################################################################
 variable "staging_backend_branch" {
-  default     = "staging"
+  default     = "terraform"
   description = "staging branch"
 }
 
@@ -25,7 +25,7 @@ variable "staging_beanstalk_description" {
 }
 
 variable "staging_deployment_branch" {
-  default     = "main"
+  default     = "terraform"
   description = "branch to pull from Github"
 }
 
