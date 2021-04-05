@@ -53,11 +53,7 @@ resource "aws_iam_role_policy" "codebuild_policy" {
         "${aws_s3_bucket.staging_codebuild_bucket.arn}",
         "${aws_s3_bucket.staging_codebuild_bucket.arn}/*",
         "${aws_s3_bucket.staging_codepipeline_bucket.arn}",
-        "${aws_s3_bucket.staging_codepipeline_bucket.arn}/*",
-        "${aws_s3_bucket.production_codebuild_bucket.arn}",
-        "${aws_s3_bucket.production_codebuild_bucket.arn}/*",
-        "${aws_s3_bucket.production_codepipeline_bucket.arn}",
-        "${aws_s3_bucket.production_codepipeline_bucket.arn}/*"
+        "${aws_s3_bucket.staging_codepipeline_bucket.arn}/*"
       ]
     },
     {
