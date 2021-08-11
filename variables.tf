@@ -11,6 +11,24 @@ variable "backend_repository" {
   description = "GitHub repository for backend code"
 }
 
+variable "cluster_name" {
+    description = "The name to use for all the cluster resources"
+    type = string 
+
+}
+
+variable "beanstalk_description" {
+    description = "description of beanstalk application"
+    type = string 
+    default     = "backend deployment for staging"
+
+}
+
+variable "domain_name" {
+  default     = "api.tiltstaging.dev"
+  description = "staging domain name"
+}
+
 ################################################################################
 # Staging Variables
 ################################################################################
@@ -76,3 +94,5 @@ variable "production_name" {
   default     = "tilt-production"
   description = "name of production pipeline"
 }
+
+

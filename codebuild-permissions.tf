@@ -50,10 +50,10 @@ resource "aws_iam_role_policy" "codebuild_policy" {
       ],
       "Effect": "Allow",
       "Resource": [
-        "${aws_s3_bucket.staging_codebuild_bucket.arn}",
-        "${aws_s3_bucket.staging_codebuild_bucket.arn}/*",
-        "${aws_s3_bucket.staging_codepipeline_bucket.arn}",
-        "${aws_s3_bucket.staging_codepipeline_bucket.arn}/*"
+        "${aws_s3_bucket.codebuild_bucket.arn}",
+        "${aws_s3_bucket.codebuild_bucket.arn}/*",
+        "${aws_s3_bucket.codepipeline_bucket.arn}",
+        "${aws_s3_bucket.codepipeline_bucket.arn}/*"
       ]
     },
     {
